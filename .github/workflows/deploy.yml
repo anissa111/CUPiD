@@ -22,11 +22,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-latest
+
     defaults:
       run:
         shell: bash -l {0}
@@ -41,7 +39,6 @@ jobs:
       - name: Set environment variables
         run: |
             echo "TODAY=$(date +%Y-%m-%d)" >> $GITHUB_ENV
-            echo ${{ needs.deploy.outputs.page_url }}
 
       - name: Set up conda environment
         uses: mamba-org/setup-micromamba@v1
@@ -65,13 +62,33 @@ jobs:
           cd docs
           make html
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
           path: './docs/_build/html/'
+
+
+  deploy:
+    needs: build
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+        # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
 
       - name: Deploy to GitHub Pages
         id: deployment
