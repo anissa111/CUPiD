@@ -23,9 +23,6 @@ concurrency:
 
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -35,7 +32,7 @@ jobs:
         run: |
             echo "TODAY=$(date +%Y-%m-%d)" >> $GITHUB_ENV
 
-      - name: Set up onda environment
+      - name: Set up conda environment
         uses: mamba-org/setup-micromamba@v1
         with:
             environment-file: build_envs/docs.yml
@@ -58,13 +55,12 @@ jobs:
           make html
       - name: Setup Pages
         uses: actions/configure-pages@v3
-      - name: what do we have in here
-        run: |
-          tree .
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
           path: './docs/_build/html/'
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
