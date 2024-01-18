@@ -47,7 +47,6 @@ jobs:
 
       - name: Install CUPiD
         run: |
-          conda activate cupid-docs
           python -m pip install --no-deps -e .
 
       - name: conda list
@@ -56,9 +55,9 @@ jobs:
 
       - name: make html
         run: |
-          conda activate cupid-docs
           cd docs
           make html
+
       - name: Setup Pages
         uses: actions/configure-pages@v3
 
